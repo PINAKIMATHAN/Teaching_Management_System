@@ -1,0 +1,23 @@
+{% extends 'main_app/base.html' %}
+
+{% block page_title %}📄 My Results{% endblock %}
+
+{% block content %}
+
+<table class="table table-striped">
+    <tr>
+        <th>Subject</th>
+        <th>Marks</th>
+        <th>Percentage</th>
+    </tr>
+
+    {% for r in results %}
+    <tr>
+        <td>{{ r.subject }}</td>
+        <td>{{ r.marks_obtained }}</td>
+        <td>{{ r.percentage|floatformat:2 }}%</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

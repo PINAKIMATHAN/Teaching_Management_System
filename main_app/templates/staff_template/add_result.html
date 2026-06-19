@@ -1,0 +1,16 @@
+{% extends 'main_app/base.html' %}
+
+{% block page_title %}➕ Add Result{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn btn-primary w-100">Save Result</button>
+    </form>
+</div>
+
+{% endblock %}

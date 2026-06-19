@@ -1,0 +1,62 @@
+{% extends 'main_app/base.html' %}
+
+{% block page_title %}📢 Notices{% endblock %}
+
+{% block content %}
+
+<style>
+.notice-card {
+    background: rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+/* 🔥 BLINKING NEW */
+.blink {
+    color: red;
+    font-weight: bold;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+</style>
+
+<a href="{% url 'add_notice' %}" class="btn btn-primary mb-3">
+    ➕ Add Notice
+</a>
+
+{% for n in notices %}
+<div class="notice-card">
+
+    <h5>
+        {{ n.title }}
+
+        {% if n.is_new %}
+            <span class="blink">NEW</span>
+        {% endif %}
+    </h5>
+
+    <p>{{ n.message }}</p>
+
+    <small>{{ n.created_at }}</small>
+
+    {% if n.file %}
+        <br>
+        <a href="{{ n.file.url }}" class="btn btn-sm btn-success mt-2" download>
+            ⬇ Download
+        </a>
+    {% endif %}
+
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% if n.course %}
+    <small>📚 Course: {{ n.course }}</small>
+{% else %}
+    <small>🌍 Global Notice</small>
+{% endif %}

@@ -1,0 +1,159 @@
+{% extends 'main_app/base.html' %}
+
+{% block page_title %}📊 Student Results{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* CARD */
+.result-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* BUTTONS */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.btn-custom {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* TABLE */
+.table {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+th {
+    background: linear-gradient(135deg, #5e64ff, #4c52ff);
+    color: white;
+}
+
+/* GRADE COLORS */
+.Aplus { color: #00ff88; font-weight: bold; }
+.A { color: #28a745; }
+.B { color: #17a2b8; }
+.C { color: orange; }
+.F { color: red; font-weight: bold; }
+
+</style>
+
+<div class="result-card">
+
+    <!-- 🔥 ACTION BAR -->
+    <div class="action-bar">
+
+        <div>
+            <a href="{% url 'add_result' %}" class="btn btn-success btn-sm">
+                ➕ Add Result
+            </a>
+
+            <button onclick="window.print()" class="btn btn-warning btn-sm">
+                🖨 Print
+            </button>
+        </div>
+
+        <div>
+            <a href="{% url 'admin_home' %}" class="btn btn-info btn-sm">
+                🏠 Dashboard
+            </a>
+        </div>
+
+    </div>
+
+    <!-- 🔍 FILTER -->
+    <form method="GET" style="margin-bottom:15px;">
+        <select name="student" onchange="this.form.submit()" class="form-control" style="width:250px;">
+            <option value="">All Students</option>
+            {% for s in students %}
+                <option value="{{ s.id }}" {% if request.GET.student == s.id|stringformat:"s" %}selected{% endif %}>
+                    {{ s.admin.first_name }} {{ s.admin.last_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+<div class="card mb-3 p-3">
+    <h4>🏆 Top Performers</h4>
+
+    <ol>
+        {% for t in toppers %}
+            <li>
+                {{ t.student__admin__first_name }} {{ t.student__admin__last_name }}
+                - <strong>{{ t.total }}</strong> Marks
+            </li>
+        {% endfor %}
+    </ol>
+</div>
+
+<div class="card p-3 mb-3">
+    <h4>📊 Performance Chart</h4>
+    <canvas id="resultChart"></canvas>
+</div>
+
+    <!-- 📊 TABLE -->
+    <table class="table table-bordered text-center">
+        <tr>
+            <th>Student</th>
+            <th>Subject</th>
+            <th>Marks</th>
+            <th>Total</th>
+            <th>%</th>
+            <th>Grade</th>
+        </tr>
+
+        {% for r in results %}
+        <tr>
+            <td>{{ r.student }}</td>
+            <td>{{ r.subject }}</td>
+            <td>{{ r.marks_obtained }}</td>
+            <td>{{ r.total_marks }}</td>
+            <td>{{ r.percentage|floatformat:2 }}%</td>
+
+            <td class="
+                {% if r.grade == 'A+' %}Aplus
+                {% elif r.grade == 'A' %}A
+                {% elif r.grade == 'B' %}B
+                {% elif r.grade == 'C' %}C
+                {% else %}F
+                {% endif %}
+            ">
+                {{ r.grade }}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</div>
+
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('resultChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ labels|safe }},
+        datasets: [{
+            label: 'Total Marks',
+            data: {{ data|safe }},
+        }]
+    }
+});
+</script>
